@@ -48,13 +48,13 @@ defmodule Minesweeper do
   end
 
   def _abre_jogada(list, minas, tab, tuple) do
-    update_pos(tab, elem(tuple, 0), elem(tuple, 1), "0")
-    _abre_jogada(list, minas, tab)
+    novo_tab = update_pos(tab, elem(tuple, 0), elem(tuple, 1), "0")
+    _abre_jogada(list, minas, novo_tab)
   end
 
   def _abre_jogada([h | t], minas, tab) do
-    abre_jogada(elem(h, 0), elem(h, 1), minas, tab)
-    _abre_jogada(t, minas, tab)
+    novo_tab = abre_jogada(elem(h, 0), elem(h, 1), minas, tab)
+    _abre_jogada(t, minas, novo_tab)
   end
 
   def _abre_jogada([], _minas, tab), do: tab
