@@ -28,7 +28,7 @@ defmodule Minesweeper do
   # update_pos/4 (update position): recebe um tabuleiro, uma linha, uma coluna e um novo valor. Devolve
   # o tabuleiro modificado com o novo valor na posiçao linha x coluna. Usar update_arr/3 e get_arr/2 na implementação
 
-  def update_pos(tab,l,c,v), do: update_arr(tab, c, get_arr(tab, l) |> update_arr(c, v))
+  def update_pos(tab,l,c,v), do: update_arr(tab, l, get_arr(tab, l) |> update_arr(c, v))
 
   # SEGUNDA PARTE: LÓGICA DO JOGO
 
@@ -88,16 +88,15 @@ defmodule Minesweeper do
   # existem nas posições adjacentes
 
   def conta_minas_adj(tab,l,c) do
-    l = valid_moves(length(tab), l, c)
-    _conta_minas(l, tab, 0)
+    _conta_minas(valid_moves(length(tab), l, c), tab, 0)
   end
 
-  def _conta_minas([], _tab, c), do: c
+  def _conta_minas([], _tab, counter), do: counter
 
-  def _conta_minas([h | t], tab, c) do
+  def _conta_minas([h | t], tab, counter) do
     cond do
-        is_mine(tab, elem(h, 0), elem(h, 1)) -> _conta_minas(t, tab, c + 1)
-        true -> _conta_minas(t, tab, c)
+        is_mine(tab, elem(h, 0), elem(h, 1)) -> _conta_minas(t, tab, counter + 1)
+        true -> _conta_minas(t, tab, counter)
     end
   end
 
@@ -117,11 +116,16 @@ defmodule Minesweeper do
 
   def abre_jogada(l,c,minas,tab) do
      cond do
-        is_mine(tab, l, c) -> tab
-        get_pos(tab, l, c) != '-' -> tab
-        conta_minas_adj(tab, l, c) > 0 -> update_pos(tab, l, c, conta_minas_adj(tab, l, c))
-        true -> _abre_jogada([{l, c} | valid_moves(length(tab), l, c)], minas, tab)
+        is_mine(minas, l, c) -> tab
+        get_pos(tab, l, c) != "-" -> tab
+        conta_minas_adj(minas, l, c) > 0 -> update_pos(tab, l, c, conta_minas_adj(minas, l, c))
+        true -> _abre_jogada([valid_moves(length(tab), l, c)], minas, tab, {l, c})
      end
+  end
+
+  def _abre_jogada([h | t], minas, tab, tuple) do
+    update_pos(tab, elem(tuple, 0), elem(tuple, 1), 0)
+    _abre_jogada([h | t], minas, tab)
   end
 
   def _abre_jogada([h | t], minas, tab) do
@@ -139,8 +143,8 @@ defmodule Minesweeper do
 
   def abre_posicao(tab,minas,l,c) do
     cond do
-        is_mine(minas, l, c) -> update_pos(tab, l, c, '*')
-        get_pos(tab, l, c) == '-' ->  update_pos(tab, l, c, conta_minas_adj(tab, l, c))
+        is_mine(minas, l, c) -> update_pos(tab, l, c, "*")
+        get_pos(tab, l, c) == "-" ->  update_pos(tab, l, c, conta_minas_adj(tab, l, c))
         true -> nil
     end
   end
@@ -239,7 +243,7 @@ defmodule Minesweeper do
 
   def _conta_fechadas2([h | t], c) do
     cond do
-      h == '-' -> _conta_fechadas2(t, c + 1)
+      h == "-" -> _conta_fechadas2(t, c + 1)
       true -> _conta_fechadas2(t, c)
     end
   end
