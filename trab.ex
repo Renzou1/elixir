@@ -63,7 +63,7 @@ defmodule Minesweeper do
     cond do
         is_mine(minas, l, c) -> update_pos(tab, l, c, "*")
         get_pos(tab, l, c) == "-" ->  update_pos(tab, l, c, conta_minas_adj(minas, l, c))
-        true -> nil
+        true -> tab
     end
   end
 
@@ -76,7 +76,7 @@ defmodule Minesweeper do
     cond do
       c2 + 1 < length(tab) -> _abre_tabuleiro(novo_tab, minas, c, c2 + 1)
       c + 1 < length(tab) -> _abre_tabuleiro(novo_tab, minas, c + 1, 0)
-      true -> novo_tab
+      true -> tab
     end
   end
 
